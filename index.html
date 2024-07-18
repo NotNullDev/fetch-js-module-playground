@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head class="dark" data-theme="night">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.10/dist/full.min.css" rel="stylesheet" type="text/css" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Document</title>
+</head>
+<body class="p-8">
+    <input id="user-input" class="input input-bordered input-sm" />
+    <div class="grid">
+
+        <div class="grid-col-6">
+            <p>Result:</p>
+            <pre id="result"></pre>
+        </div>
+
+        <label class="flex gap-1 flex-col w-48 grid-col-6">
+            <span>Transformer</span>
+            <select class="select select-bordered select-sm">
+                <option value="" >-</option>
+            </select>
+        </label>
+    </div>
+
+    <script lang="js" type="module">
+        const select = document.querySelector("select");
+
+        let transformersModule;
+        let availabelFunctions;
+        let selectedFunctionName = '';
+
+        import('/functions.js').then(res => {
+            transformersModule = res;
+            availabelFunctions = Object.keys(res);
+
+            start();
+        })
+
+        function start() {
+            createOptions();
+
+            select.addEventListener('change', (e) => {
+                selectedFunctionName = e.currentTarget.value;
+            })
+
+            const resultEl = document.querySelector("#result");
+            /**
+             * @type {HTMLInputElement}
+            */
+            const userInput = document.querySelector("#user-input")
+
+            userInput.addEventListener('keydown', (ev) => {
+                const inVal = ev.currentTarget.value;
+
+                if (selectedFunctionName) {
+                    const funcToInvoke = transformersModule[selectedFunctionName];
+                    if (!funcToInvoke) {
+                        alert(`function ${selectedFunctionName} not found in module`);
+                        return;
+                    }
+
+                    resultEl.innerHTML = funcToInvoke(inVal);
+                    return;
+                }
+
+                resultEl.innerHTML = inVal;
+            })
+        }
+
+        function createOptions() {
+            for (const f of availabelFunctions) {
+                const option = document.createElement('option')
+
+                option.innerText = f;
+                option.value = f;
+
+                select.appendChild(option)
+            }
+        }
+
+
+    </script>
+
+</body>
+
+</html>
